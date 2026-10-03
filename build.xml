@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="QLTSTB" default="build" basedir=".">
+
+    <!-- NetBeans generates this file from nbproject/project.xml + project.properties -->
+    <import file="nbproject/build-impl.xml"/>
+
+    <property name="qltsb.lib.dir"     value="lib"/>
+    <property name="qltsb.classes.dir" value="build/classes"/>
+    <property name="qltsb.dist.dir"    value="dist"/>
+    <property name="qltsb.jar.file"    value="${qltsb.dist.dir}/QLTSTB-1.0.jar"/>
+
+    <path id="qltsb.classpath">
+        <fileset dir="${qltsb.lib.dir}" includes="**/*.jar"/>
+    </path>
+
+    <!--
+      NetBeans' generated build-impl.xml reads javac.classpath / run.classpath /
+      debug.classpath, but only emits definitions for libraries it knows about in
+      its own project model. Defining them here fixes the classpath for every
+      target in build-impl.xml (compile, run, run-single, debug, jar).
+
+      These are set at parse time, so they win over nbproject/project.properties,
+      which build-impl.xml loads later at runtime. Using refid also gives us the
+      platform-correct path separator instead of a hand-written one.
+    -->
+    <path id="qltsb.compile.classpath">
+        <path refid="qltsb.classpath"/>
+    </path>
+
+    <path id="qltsb.runtime.classpath">
+        <pathelement location="${qltsb.classes.dir}"/>
+        <path refid="qltsb.classpath"/>
+    </path>
+
+    <property name="javac.classpath"  refid="qltsb.compile.classpath"/>
+    <property name="run.classpath"    refid="qltsb.runtime.classpath"/>
+    <property name="debug.classpath"  refid="qltsb.runtime.classpath"/>
+
+    <!--
+      Targets below are IDE-independent and do not rely on nbproject/private
+      settings. They compile and run straight from src/ + lib/.
+    -->
+
+    <target name="standalone-compile" description="Compile src/ without NetBeans private settings">
+        <mkdir dir="${qltsb.classes.dir}"/>
+        <javac srcdir="src"
+               destdir="${qltsb.classes.dir}"
+               encoding="UTF-8"
+               debug="true"
+               includeantruntime="false"
+               release="17">
+            <classpath refid="qltsb.classpath"/>
+            <compilerarg value="-Xlint:all,-serial"/>
+        </javac>
+    </target>
+
+    <target name="standalone-jar" depends="standalone-compile" description="Build a runnable jar">
+        <mkdir dir="${qltsb.dist.dir}"/>
+        <jar destfile="${qltsb.jar.file}" basedir="${qltsb.classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="com.company.qlts.Main"/>
+                <attribute name="Implementation-Title" value="QLTSTB"/>
+                <attribute name="Implementation-Version" value="1.0"/>
+            </manifest>
+        </jar>
+        <copy todir="${qltsb.dist.dir}/lib" flatten="true">
+            <fileset dir="${qltsb.lib.dir}" includes="**/*.jar"/>
+        </copy>
+        <echo message="Built ${qltsb.jar.file}"/>
+    </target>
+
+    <target name="run-app" depends="standalone-compile" description="Run com.company.qlts.Main">
+        <java classname="com.company.qlts.Main" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="${qltsb.classes.dir}"/>
+                <path refid="qltsb.classpath"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="run-app-jar" depends="standalone-jar" description="Run from the built jar">
+        <java jar="${qltsb.jar.file}" fork="true" failonerror="true">
+            <classpath>
+                <fileset dir="${qltsb.lib.dir}" includes="**/*.jar"/>
+            </classpath>
+        </java>
+    </target>
+
+</project>
